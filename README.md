@@ -1,5 +1,7 @@
 # examples
 
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/ipsofacto-io/examples/badge)](https://scorecard.dev/viewer/?uri=github.com/ipsofacto-io/examples)
+
 Sample repositories with ipso decisions enforced on TypeScript, JVM, Terraform and Kubernetes code.
 
 > Status: skeleton. The samples land in a later change and will pin released ipso versions.
