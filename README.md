@@ -4,7 +4,7 @@
 
 Sample repositories with ipso decisions enforced on TypeScript, JVM, Terraform and Kubernetes code.
 
-> Status: two samples so far, a Terraform plan check run by [`ipso-action`](https://github.com/ipsofacto-io/ipso-action) and an Atlantis that refuses to apply a failing plan. More samples land in a later change and will pin released ipso versions.
+> Status: a Terraform plan check run by [`ipso-action`](https://github.com/ipsofacto-io/ipso-action), an Atlantis that refuses to apply a failing plan, Kubernetes rendering, four adapter tools, and three platform hooks. Most run real tools on every change to them. The platform hooks have not run on the vendors' platforms. Some samples build a merged `ipso` commit until a release carries what they use.
 
 Each sample is a small project that shows one canonical decision, such as private object storage, a ban on importing another service's internal package, an allow-list of Terraform modules, or Postgres as the only database.
 
@@ -18,6 +18,18 @@ Each sample is a small project that shows one canonical decision, such as privat
 ## Atlantis
 
 [`atlantis/`](atlantis/) runs a real Atlantis against a throwaway Gitea, with one workflow that adds `ipso check plan` to the plan stage. A plan that breaks a blocking decision fails, and `atlantis apply` then has nothing to apply. A plan that breaks only a warning applies. The `atlantis / e2e` job proves both whenever that directory changes.
+
+## Kubernetes
+
+[`kubernetes/`](kubernetes/) renders a Helm chart and a Kustomize overlay offline with `ipso render`, and `ipso check kyverno` reads the result. The `kubernetes / e2e` job runs the pinned tools whenever that directory changes.
+
+## Pulumi, CloudFormation, CDK, and Bicep
+
+[`adapters/`](adapters/) has one decision per adapter family, and one sample that passes and one that fails for each tool. The `adapters / e2e` job runs the real tools, with no cloud account, whenever that directory changes.
+
+## Spacelift, env0, and Scalr
+
+[`platforms/`](platforms/) holds a hook for each platform. The `platforms / hooks` job runs the exact commands on real Terraform plans and checks their exit codes. It runs no vendor code, so it says nothing about what a platform does with an exit code.
 
 ## License
 
