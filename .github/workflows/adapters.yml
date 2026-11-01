@@ -36,7 +36,7 @@ jobs:
       - name: Install ipso and the pinned tools
         env:
           # The adapter commands are not in a release yet, so this builds the merged commit.
-          IPSO_COMMIT: 8b807147aa68a39076e884d44d4854b12a2c0216
+          IPSO_COMMIT: b5776b6694ab69e187d96e245763597784750273
         run: |
           set -euo pipefail
           bin="${RUNNER_TEMP}/bin"
