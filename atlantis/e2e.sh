@@ -27,7 +27,8 @@ compose() {
 cleanup() {
   status=$?
   if [ "$status" -ne 0 ]; then
-    compose logs --no-color --tail=200 gitea atlantis || true
+    # The metrics lines of a debug log would push everything else out of the job log.
+    compose logs --no-color gitea atlantis 2>&1 | grep -v 'metrics/debug.go' | tail -n 200 || true
   fi
   compose down --volumes --remove-orphans || true
   rm -rf "$workdir"
