@@ -1,0 +1,9 @@
+resources:
+  - ../../base
+patches:
+  - target:
+      kind: Pod
+    patch: |
+      - op: replace
+        path: /spec/securityContext/runAsNonRoot
+        value: false
