@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .Release.Name }}-api
+spec:
+  securityContext:
+    runAsNonRoot: {{ .Values.runAsNonRoot }}
+  containers:
+    - name: api
+      image: registry.example.test/api:1.0.0
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
