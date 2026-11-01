@@ -1,0 +1,57 @@
+name: adapters
+
+on:
+  pull_request:
+    paths:
+      - adapters/**
+      - .github/workflows/adapters.yml
+  push:
+    branches: [main]
+    paths:
+      - adapters/**
+      - .github/workflows/adapters.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: adapters-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: adapters / e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.27.1"
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+      - name: Install ipso and the pinned tools
+        env:
+          # The adapter commands are not in a release yet, so this builds the merged commit.
+          IPSO_COMMIT: b5776b6694ab69e187d96e245763597784750273
+        run: |
+          set -euo pipefail
+          bin="${RUNNER_TEMP}/bin"
+          mkdir -p "$bin"
+          GOBIN="$bin" go install "github.com/ipsofacto-io/ipso/cmd/ipso@${IPSO_COMMIT}"
+          tmp="$(mktemp -d)"
+          curl -fsSL -o "${tmp}/pulumi.tar.gz" https://github.com/pulumi/pulumi/releases/download/v3.273.0/pulumi-v3.273.0-linux-x64.tar.gz
+          echo "ec08f86671fd58f0a186540e1cee00066393beaf5c6716b0075f690919800432  ${tmp}/pulumi.tar.gz" | sha256sum -c -
+          tar -xzf "${tmp}/pulumi.tar.gz" -C "$tmp"
+          cp "${tmp}"/pulumi/* "$bin/"
+          curl -fsSL -o "${bin}/bicep" https://github.com/Azure/bicep/releases/download/v0.48.1/bicep-linux-x64
+          echo "b09ec25a9d376c1f8e33ede6ed22b587f915ad68488d5db77a6f9541748c7f6e  ${bin}/bicep" | sha256sum -c -
+          chmod 0755 "${bin}/bicep"
+          echo "$bin" >> "$GITHUB_PATH"
+      - name: Install the CDK
+        run: npm ci --ignore-scripts --prefix adapters/cdk
+      - name: Run each tool and check its output
+        run: bash adapters/e2e.sh
