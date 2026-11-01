@@ -33,7 +33,7 @@ jobs:
       - name: Install ipso and the pinned tools
         env:
           # ipso render is not in a release yet, so this builds the merged commit.
-          IPSO_COMMIT: 6adf5dd6919f43c0c463c29ee1bf67482e1af9c6
+          IPSO_COMMIT: d6e7dd31c1fb12c18ea78098fcccb28b2469a787
         run: |
           set -euo pipefail
           bin="${RUNNER_TEMP}/bin"
