@@ -5,11 +5,13 @@ services:
     image: docker.gitea.com/gitea:28.3.0@sha256:8967bf9deaf3c5c4adae13519436dc1b20c646ac83fe37ae810c933a1045227d
     environment:
       GITEA__database__DB_TYPE: sqlite3
+      GITEA__security__ALLOWED_HOST_LIST: private
       GITEA__security__INSTALL_LOCK: "true"
       GITEA__server__DOMAIN: gitea
+      # e2e.sh talks to Gitea on loopback, and Atlantis must still clone from the name it can reach.
+      GITEA__server__PUBLIC_URL_DETECTION: never
       GITEA__server__ROOT_URL: http://gitea:3000/
       GITEA__service__DISABLE_REGISTRATION: "true"
-      GITEA__webhook__ALLOWED_HOST_LIST: private
     ports:
       - 127.0.0.1:3000:3000
 
