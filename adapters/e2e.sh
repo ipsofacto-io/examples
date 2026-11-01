@@ -44,7 +44,9 @@ verdict 1 "RandomPassword::databasePassword: generated passwords have at least 1
 
 echo "== CloudFormation"
 verdict 0 "no-public-buckets: checks[0] (block): pass" cloudformation cloudformation/pass.yaml
-verdict 1 "LogsBucket: S3 buckets have no public ACL" cloudformation cloudformation/fail.yaml
+# The failing template is written here, so the repository holds no public bucket for its own scans to flag.
+sed 's/AccessControl: Private/AccessControl: PublicRead/' cloudformation/pass.yaml >"${out}/fail.yaml"
+verdict 1 "LogsBucket: S3 buckets have no public ACL" cloudformation "${out}/fail.yaml"
 
 echo "== CDK"
 (
