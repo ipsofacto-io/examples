@@ -1,0 +1,4 @@
+apiVersion: v2
+name: api
+description: A sample chart whose values decide whether the pod runs as root.
+version: 0.1.0

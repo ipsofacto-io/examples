@@ -1,0 +1,55 @@
+name: kubernetes
+
+on:
+  pull_request:
+    paths:
+      - kubernetes/**
+      - .github/workflows/kubernetes.yml
+  push:
+    branches: [main]
+    paths:
+      - kubernetes/**
+      - .github/workflows/kubernetes.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kubernetes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    name: kubernetes / e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.27.1"
+      - name: Install ipso and the pinned tools
+        env:
+          # ipso render is not in a release yet, so this builds the merged commit.
+          IPSO_COMMIT: d6e7dd31c1fb12c18ea78098fcccb28b2469a787
+        run: |
+          set -euo pipefail
+          bin="${RUNNER_TEMP}/bin"
+          mkdir -p "$bin"
+          GOBIN="$bin" go install "github.com/ipsofacto-io/ipso/cmd/ipso@${IPSO_COMMIT}"
+          install_archive() {
+            local url="$1" sum="$2" inside="$3" tmp
+            tmp="$(mktemp -d)"
+            curl -fsSL -o "${tmp}/archive.tar.gz" "$url"
+            echo "${sum}  ${tmp}/archive.tar.gz" | sha256sum -c -
+            tar -xzf "${tmp}/archive.tar.gz" -C "$tmp"
+            install -m 0755 "${tmp}/${inside}" "${bin}/$(basename "$inside")"
+          }
+          install_archive https://get.helm.sh/helm-v4.3.1-linux-amd64.tar.gz 0403a88ae20913d11b10a2467b50087721fea7581736da6b9d3992f5357fe54b linux-amd64/helm
+          install_archive https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.8.3/kustomize_v5.8.3_linux_amd64.tar.gz cb9e31198d3f63b44848bd0afc4c8efc56e6cfef9c93a4a39a211940e6decd61 kustomize
+          install_archive https://github.com/kyverno/kyverno/releases/download/v1.19.2/kyverno-cli_v1.19.2_linux_x86_64.tar.gz 357eaf1df8bc24ddd5a73979fadeaae6a032e8710f11af264229756e4956bf4a kyverno
+          echo "$bin" >> "$GITHUB_PATH"
+      - name: Render and check the sample
+        run: bash kubernetes/e2e.sh
