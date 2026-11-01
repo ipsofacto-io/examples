@@ -1,0 +1,11 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  Name:
+    Type: String
+Resources:
+  LogsBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Sub "${Name}-logs"
+      AccessControl: PublicRead

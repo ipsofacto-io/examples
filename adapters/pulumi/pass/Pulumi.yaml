@@ -1,0 +1,9 @@
+name: adapters-pass
+runtime: yaml
+resources:
+  databasePassword:
+    type: random:RandomPassword
+    properties:
+      length: 32
+    options:
+      version: 4.21.4
