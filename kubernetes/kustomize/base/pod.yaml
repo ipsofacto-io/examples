@@ -8,3 +8,6 @@ spec:
   containers:
     - name: api
       image: registry.example.test/api:1.0.0
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
