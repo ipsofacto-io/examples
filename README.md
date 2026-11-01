@@ -4,7 +4,7 @@
 
 Sample repositories with ipso decisions enforced on TypeScript, JVM, Terraform and Kubernetes code.
 
-> Status: one sample so far, a Terraform plan check run by [`ipso-action`](https://github.com/ipsofacto-io/ipso-action). More samples land in a later change and will pin released ipso versions.
+> Status: two samples so far, a Terraform plan check run by [`ipso-action`](https://github.com/ipsofacto-io/ipso-action) and an Atlantis that refuses to apply a failing plan. More samples land in a later change and will pin released ipso versions.
 
 Each sample is a small project that shows one canonical decision, such as private object storage, a ban on importing another service's internal package, an allow-list of Terraform modules, or Postgres as the only database.
 
@@ -14,6 +14,10 @@ Each sample is a small project that shows one canonical decision, such as privat
 
 - [`docs/decisions/0001-no-public-bucket-acl.md`](docs/decisions/0001-no-public-bucket-acl.md) blocks, and the plan obeys it, so the job stays green.
 - [`docs/decisions/0002-encrypted-ebs-volumes.md`](docs/decisions/0002-encrypted-ebs-volumes.md) warns, and the plan breaks it on purpose. Its alert shows up in the Security tab of this repository.
+
+## Atlantis
+
+[`atlantis/`](atlantis/) runs a real Atlantis against a throwaway Gitea, with one workflow that adds `ipso check plan` to the plan stage. A plan that breaks a blocking decision fails, and `atlantis apply` then has nothing to apply. A plan that breaks only a warning applies. The `atlantis / e2e` job proves both on every pull request.
 
 ## License
 

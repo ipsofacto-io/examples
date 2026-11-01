@@ -1,0 +1,33 @@
+# A throwaway Gitea and Atlantis on this machine. e2e.sh generates the secrets and removes
+# everything at the end. Both ports listen on loopback only. Do not copy this file to production.
+services:
+  gitea:
+    image: docker.gitea.com/gitea:28.3.0@sha256:8967bf9deaf3c5c4adae13519436dc1b20c646ac83fe37ae810c933a1045227d
+    environment:
+      GITEA__database__DB_TYPE: sqlite3
+      GITEA__security__INSTALL_LOCK: "true"
+      GITEA__server__DOMAIN: gitea
+      GITEA__server__ROOT_URL: http://gitea:3000/
+      GITEA__service__DISABLE_REGISTRATION: "true"
+      GITEA__webhook__ALLOWED_HOST_LIST: atlantis
+    ports:
+      - 127.0.0.1:3000:3000
+
+  atlantis:
+    build: .
+    command: ["server"]
+    # The Atlantis service starts only after e2e.sh has created its Gitea user and token.
+    profiles: [atlantis]
+    environment:
+      ATLANTIS_ATLANTIS_URL: http://atlantis:4141
+      ATLANTIS_DATA_DIR: /home/atlantis/.atlantis
+      ATLANTIS_GITEA_BASE_URL: http://gitea:3000
+      ATLANTIS_GITEA_TOKEN: ${ATLANTIS_GITEA_TOKEN:-}
+      ATLANTIS_GITEA_USER: atlantis
+      ATLANTIS_GITEA_WEBHOOK_SECRET: ${ATLANTIS_GITEA_WEBHOOK_SECRET:-}
+      ATLANTIS_REPO_ALLOWLIST: "*"
+      ATLANTIS_REPO_CONFIG: /etc/atlantis/repos.yaml
+    volumes:
+      - ./repos.yaml:/etc/atlantis/repos.yaml:ro
+    ports:
+      - 127.0.0.1:4141:4141
