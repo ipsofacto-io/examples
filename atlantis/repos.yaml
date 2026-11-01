@@ -1,0 +1,29 @@
+# Server-side Atlantis repo config. A pull request cannot change anything in this file.
+repos:
+  - id: /.*/
+    workflow: ipso
+    # No key is overridable and no repository can define a workflow, so a pull request
+    # cannot drop the ipso step. Add approved and mergeable to apply_requirements in production.
+    allowed_overrides: []
+    allow_custom_workflows: false
+    apply_requirements: [undiverged]
+
+workflows:
+  ipso:
+    plan:
+      steps:
+        - init
+        - plan
+        - show
+        # Atlantis keeps the plan file when a later step fails, and `atlantis apply` looks
+        # for plan files. Removing it on a failed verdict leaves nothing to apply.
+        - run: |
+            status=0
+            cd "$(git rev-parse --show-toplevel)" || status=$?
+            if [ "$status" -eq 0 ]; then
+              ipso check && ipso compile && ipso check plan "$SHOWFILE" || status=$?
+            fi
+            if [ "$status" -ne 0 ]; then
+              rm -f "$PLANFILE"
+            fi
+            exit "$status"
