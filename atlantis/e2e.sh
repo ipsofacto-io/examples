@@ -165,7 +165,9 @@ esac
 
 echo "== fix the plan and keep the warning"
 before="$(comment_count "$pull")"
-sed -i.bak 's/public = true/public = false/' "${workdir}/terraform/main.tf"
+# The fix keeps a change against main, because Atlantis plans only a project the pull request changes.
+sed -i.bak 's/public = true/public = false\
+    tier   = "internal"/' "${workdir}/terraform/main.tf"
 rm -f "${workdir}/terraform/main.tf.bak"
 git -C "$workdir" commit -q -am "fix: keep the endpoint private"
 git -C "$workdir" push -q origin public-endpoint
