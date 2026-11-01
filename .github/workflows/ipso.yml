@@ -1,0 +1,30 @@
+name: ipso
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ipso-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    name: ipso / plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ipsofacto-io/ipso-action@0aea451c49ac02141b63fe9f3045f7ee3dee0f72 # main, before the first release
+        with:
+          command: plan
+          args: terraform/plan.json

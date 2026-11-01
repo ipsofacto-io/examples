@@ -1,0 +1,35 @@
+{
+  "format_version": "1.2",
+  "resource_changes": [
+    {
+      "address": "aws_s3_bucket.logs",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "change": {
+        "actions": ["create"],
+        "after": {"bucket": "logs", "id": "logs"},
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_s3_bucket_acl.logs",
+      "mode": "managed",
+      "type": "aws_s3_bucket_acl",
+      "change": {
+        "actions": ["create"],
+        "after": {"bucket": "logs", "acl": "private"},
+        "after_unknown": {}
+      }
+    },
+    {
+      "address": "aws_ebs_volume.data",
+      "mode": "managed",
+      "type": "aws_ebs_volume",
+      "change": {
+        "actions": ["create"],
+        "after": {"encrypted": false},
+        "after_unknown": {}
+      }
+    }
+  ]
+}

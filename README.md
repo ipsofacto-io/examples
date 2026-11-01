@@ -4,9 +4,16 @@
 
 Sample repositories with ipso decisions enforced on TypeScript, JVM, Terraform and Kubernetes code.
 
-> Status: skeleton. The samples land in a later change and will pin released ipso versions.
+> Status: one sample so far, a Terraform plan check run by [`ipso-action`](https://github.com/ipsofacto-io/ipso-action). More samples land in a later change and will pin released ipso versions.
 
 Each sample is a small project that shows one canonical decision, such as private object storage, a ban on importing another service's internal package, an allow-list of Terraform modules, or Postgres as the only database.
+
+## Terraform plan check
+
+[`.github/workflows/ipso.yml`](.github/workflows/ipso.yml) runs `ipso check plan` on [`terraform/plan.json`](terraform/plan.json) on every pull request. It uploads a SARIF file to code scanning and keeps the evidence as an artifact.
+
+- [`docs/decisions/0001-no-public-bucket-acl.md`](docs/decisions/0001-no-public-bucket-acl.md) blocks, and the plan obeys it, so the job stays green.
+- [`docs/decisions/0002-encrypted-ebs-volumes.md`](docs/decisions/0002-encrypted-ebs-volumes.md) warns, and the plan breaks it on purpose. Its alert shows up in the Security tab of this repository.
 
 ## License
 
