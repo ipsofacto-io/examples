@@ -17,7 +17,7 @@ Each sample is a small project that shows one canonical decision, such as privat
 
 ## Atlantis
 
-[`atlantis/`](atlantis/) runs a real Atlantis against a throwaway Gitea, with one workflow that adds `ipso check plan` to the plan stage. A plan that breaks a blocking decision fails, and `atlantis apply` then has nothing to apply. A plan that breaks only a warning applies. The `atlantis / e2e` job proves both on every pull request.
+[`atlantis/`](atlantis/) runs a real Atlantis against a throwaway Gitea, with one workflow that adds `ipso check plan` to the plan stage. A plan that breaks a blocking decision fails, and `atlantis apply` then has nothing to apply. A plan that breaks only a warning applies. The `atlantis / e2e` job proves both whenever that directory changes.
 
 ## License
 

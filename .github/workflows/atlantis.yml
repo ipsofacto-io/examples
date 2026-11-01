@@ -2,8 +2,14 @@ name: atlantis
 
 on:
   pull_request:
+    paths:
+      - atlantis/**
+      - .github/workflows/atlantis.yml
   push:
     branches: [main]
+    paths:
+      - atlantis/**
+      - .github/workflows/atlantis.yml
 
 permissions:
   contents: read

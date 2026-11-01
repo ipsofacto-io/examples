@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Drives the sample through a real Atlantis and a real Gitea, and fails unless:
 #   1. a plan that breaks the blocking decision fails, and `atlantis apply` applies nothing;
-#   2. a plan that breaks only the warning decision prints the warning and applies.
+#   2. an invalid decision fails a compliant plan and leaves no plan file;
+#   3. a plan that breaks only the warning decision prints the warning and applies.
 # Every secret is generated here and dies with the containers.
 set -euo pipefail
 
@@ -59,8 +60,9 @@ wait_for_comment() {
   local pull="$1" after="$2" text="$3" deadline found
   deadline=$((SECONDS + TIMEOUT_SECONDS))
   while [ "$SECONDS" -lt "$deadline" ]; do
+    # A failed poll is not a result, so it only means another try.
     found="$(api GET "/repos/${OWNER}/${REPO}/issues/${pull}/comments" | jq -r --argjson after "$after" --arg text "$text" \
-      '[.[$after:][] | select(.user.login == "atlantis") | select(.body | contains($text)) | .body] | first // empty')"
+      '[.[$after:][] | select(.user.login == "atlantis") | select(.body | contains($text)) | .body] | first // empty')" || found=""
     if [ -n "$found" ]; then
       printf '%s\n' "$found"
       return 0
@@ -163,10 +165,27 @@ case "$refused" in
 esac
 [ "$(state_resources)" = "0" ] || fail "a resource reached the state after the blocking verdict"
 
+echo "== an invalid decision fails closed on a compliant plan"
+before="$(comment_count "$pull")"
+sed -i.bak 's/public = true/public = false/' "${workdir}/terraform/main.tf"
+sed -i.bak 's/^status: accepted/status: nonsense/' "${workdir}/docs/decisions/0001-private-endpoints.md"
+rm -f "${workdir}/terraform/main.tf.bak" "${workdir}/docs/decisions/0001-private-endpoints.md.bak"
+git -C "$workdir" commit -q -am "fix: close the endpoint and break a decision"
+git -C "$workdir" push -q origin public-endpoint
+invalid="$(wait_for_comment "$pull" "$before" "Plan Error")"
+printf '%s\n' "$invalid"
+case "$invalid" in
+  *"docs/decisions/0001-private-endpoints.md"*) ;;
+  *) fail "the comment does not name the invalid decision" ;;
+esac
+[ "$(plan_files)" = "0" ] || fail "a plan file survived an invalid decision"
+
 echo "== fix the plan and keep the warning"
 before="$(comment_count "$pull")"
+sed -i.bak 's/^status: nonsense/status: accepted/' "${workdir}/docs/decisions/0001-private-endpoints.md"
+rm -f "${workdir}/docs/decisions/0001-private-endpoints.md.bak"
 # The fix keeps a change against main, because Atlantis plans only a project the pull request changes.
-sed -i.bak 's/public = true/public = false\
+sed -i.bak 's/public = false/public = false\
     tier   = "internal"/' "${workdir}/terraform/main.tf"
 rm -f "${workdir}/terraform/main.tf.bak"
 git -C "$workdir" commit -q -am "fix: keep the endpoint private"

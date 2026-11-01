@@ -9,7 +9,7 @@ A [real Atlantis](https://www.runatlantis.io/) that refuses to apply a Terraform
 
 ## Run it
 
-You need Docker with Compose, `curl`, `git`, `jq`, and `openssl`. Nothing leaves your machine, and both services listen on loopback only.
+You need Docker with Compose, `curl`, `git`, `jq`, and `openssl`. The run downloads the images, the ipso release, and Terraform. The sample's plans and secrets stay on your machine, and both services listen on loopback only.
 
 ```bash
 bash atlantis/e2e.sh
@@ -19,7 +19,8 @@ The script opens a pull request in Gitea and reads the comments Atlantis posts:
 
 1. The plan sets `public = true`. `private-endpoints` blocks, Atlantis reports a plan error with the resource and the reason, and the plan file is gone.
 2. A comment says `atlantis apply`. Nothing is applied and the state stays empty.
-3. A new commit sets `public = false`. The plan passes `private-endpoints`, and `endpoint-owner` prints a warning.
-4. A comment says `atlantis apply`. The apply succeeds with that warning still open.
+3. A new commit closes the endpoint and breaks a decision file. The plan is compliant, and Atlantis still reports a plan error, because ipso fails closed.
+4. Another commit repairs the decision. The plan passes `private-endpoints`, and `endpoint-owner` prints a warning.
+5. A comment says `atlantis apply`. The apply succeeds with that warning still open.
 
-The `atlantis / e2e` job runs the same script on every pull request in this repository.
+The `atlantis / e2e` job runs the same script whenever this directory changes.
