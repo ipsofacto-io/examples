@@ -1,0 +1,43 @@
+name: ipso
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ipso-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    name: ipso / plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # No published ipso release has --sarif yet. Once v0.3.0 is out, drop these two steps
+      # and cli-path, and the action installs and verifies that release itself.
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.27.1"
+          cache: false
+      - name: Build ipso
+        id: cli
+        run: |
+          set -euo pipefail
+          go install github.com/ipsofacto-io/ipso/cmd/ipso@d82d92f623d8e59f92c01ccf381b78ddd77bcceb
+          echo "path=$(go env GOPATH)/bin/ipso" >> "$GITHUB_OUTPUT"
+      - uses: ipsofacto-io/ipso-action@0aea451c49ac02141b63fe9f3045f7ee3dee0f72 # main, before the first release
+        with:
+          command: plan
+          args: terraform/plan.json
+          cli-path: ${{ steps.cli.outputs.path }}
