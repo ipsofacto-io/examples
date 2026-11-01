@@ -9,7 +9,7 @@ services:
       GITEA__server__DOMAIN: gitea
       GITEA__server__ROOT_URL: http://gitea:3000/
       GITEA__service__DISABLE_REGISTRATION: "true"
-      GITEA__webhook__ALLOWED_HOST_LIST: atlantis
+      GITEA__webhook__ALLOWED_HOST_LIST: private
     ports:
       - 127.0.0.1:3000:3000
 
@@ -26,6 +26,7 @@ services:
       ATLANTIS_GITEA_TOKEN: ${ATLANTIS_GITEA_TOKEN:-}
       ATLANTIS_GITEA_USER: atlantis
       ATLANTIS_GITEA_WEBHOOK_SECRET: ${ATLANTIS_GITEA_WEBHOOK_SECRET:-}
+      ATLANTIS_LOG_LEVEL: debug
       ATLANTIS_REPO_ALLOWLIST: "*"
       ATLANTIS_REPO_CONFIG: /etc/atlantis/repos.yaml
     volumes:

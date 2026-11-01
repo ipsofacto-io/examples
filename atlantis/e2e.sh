@@ -27,7 +27,7 @@ compose() {
 cleanup() {
   status=$?
   if [ "$status" -ne 0 ]; then
-    compose logs --no-color --tail=200 atlantis || true
+    compose logs --no-color --tail=200 gitea atlantis || true
   fi
   compose down --volumes --remove-orphans || true
   rm -rf "$workdir"
