@@ -1,0 +1,6 @@
+version: 2
+deploy:
+  steps:
+    terraformPlan:
+      after:
+        - cd "$ENV0_ROOT_DIR" && ipso check && ipso compile && ipso check plan "${ENV0_TF_PLAN_JSON:?env0 did not provide the plan JSON}" 1>&2

@@ -1,0 +1,6 @@
+version: "2"
+stacks:
+  network:
+    project_root: terraform
+    before_apply:
+      - terraform show -json spacelift.plan > /tmp/plan.json && cd "$(git rev-parse --show-toplevel)" && ipso check && ipso compile && ipso check plan /tmp/plan.json
