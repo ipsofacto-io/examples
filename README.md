@@ -4,7 +4,7 @@
 
 Sample repositories with ipso decisions enforced on TypeScript, JVM, Terraform and Kubernetes code.
 
-> Status: a Terraform plan check run by [`ipso-action`](https://github.com/ipsofacto-io/ipso-action), an Atlantis that refuses to apply a failing plan, Kubernetes rendering, four adapter tools, and three platform hooks. Most run real tools on every change to them. The platform hooks have not run on the vendors' platforms. Some samples build a merged `ipso` commit until a release carries what they use.
+> Status: a Terraform plan check run by [`ipso-action`](https://github.com/ipsofacto-io/ipso-action), an Atlantis that refuses to apply a failing plan, Kubernetes rendering, four adapter tools, and three platform hooks. Most run real tools on every change to them, with the `ipso` v0.4.0 release. The Scalr hook has run on Scalr, and the Spacelift and env0 hooks have not run on their platforms.
 
 Each sample is a small project that shows one canonical decision, such as private object storage, a ban on importing another service's internal package, an allow-list of Terraform modules, or Postgres as the only database.
 
