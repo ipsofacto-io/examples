@@ -27,22 +27,18 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
-        with:
-          go-version: "1.27.1"
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "24"
       - name: Install ipso and the pinned tools
-        env:
-          # The adapter commands are not in a release yet, so this builds the merged commit.
-          IPSO_COMMIT: b5776b6694ab69e187d96e245763597784750273
         run: |
           set -euo pipefail
           bin="${RUNNER_TEMP}/bin"
           mkdir -p "$bin"
-          GOBIN="$bin" go install "github.com/ipsofacto-io/ipso/cmd/ipso@${IPSO_COMMIT}"
           tmp="$(mktemp -d)"
+          curl -fsSL -o "${tmp}/ipso.tar.gz" https://github.com/ipsofacto-io/ipso/releases/download/v0.4.0/ipso_0.4.0_linux_amd64.tar.gz
+          echo "632511629b3f8bbb01defba4156638177c454da951baf216fb70a0cc1350ab60  ${tmp}/ipso.tar.gz" | sha256sum -c -
+          tar -xzf "${tmp}/ipso.tar.gz" -C "$bin" ipso
           curl -fsSL -o "${tmp}/pulumi.tar.gz" https://github.com/pulumi/pulumi/releases/download/v3.273.0/pulumi-v3.273.0-linux-x64.tar.gz
           echo "ec08f86671fd58f0a186540e1cee00066393beaf5c6716b0075f690919800432  ${tmp}/pulumi.tar.gz" | sha256sum -c -
           tar -xzf "${tmp}/pulumi.tar.gz" -C "$tmp"

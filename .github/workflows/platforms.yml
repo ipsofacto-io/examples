@@ -35,8 +35,8 @@ jobs:
           bin="${RUNNER_TEMP}/bin"
           tmp="$(mktemp -d)"
           mkdir -p "$bin"
-          curl -fsSL -o "${tmp}/ipso.tar.gz" https://github.com/ipsofacto-io/ipso/releases/download/v0.3.0/ipso_0.3.0_linux_amd64.tar.gz
-          echo "8dbb29e0db4ed8f52bd7cd27c1015df122a854597e6aa40ed183e4850c2acdcb  ${tmp}/ipso.tar.gz" | sha256sum -c -
+          curl -fsSL -o "${tmp}/ipso.tar.gz" https://github.com/ipsofacto-io/ipso/releases/download/v0.4.0/ipso_0.4.0_linux_amd64.tar.gz
+          echo "632511629b3f8bbb01defba4156638177c454da951baf216fb70a0cc1350ab60  ${tmp}/ipso.tar.gz" | sha256sum -c -
           tar -xzf "${tmp}/ipso.tar.gz" -C "$bin" ipso
           curl -fsSL -o "${tmp}/terraform.zip" https://releases.hashicorp.com/terraform/1.16.4/terraform_1.16.4_linux_amd64.zip
           echo "dc94af0eef1147718ad7c8daea792ed199e3e0492eec180d0adafa2a65a879df  ${tmp}/terraform.zip" | sha256sum -c -
