@@ -5,10 +5,10 @@ ARG TARGETARCH
 
 USER root
 RUN set -eu; \
-    version=0.3.0; \
+    version=0.4.0; \
     case "${TARGETARCH}" in \
-      amd64) checksum=8dbb29e0db4ed8f52bd7cd27c1015df122a854597e6aa40ed183e4850c2acdcb ;; \
-      arm64) checksum=28e24cfaaf53e7b622e34f18a5ac60b933eb9884c7c7b0e1e99909f61291ba2d ;; \
+      amd64) checksum=632511629b3f8bbb01defba4156638177c454da951baf216fb70a0cc1350ab60 ;; \
+      arm64) checksum=af7a23a266e580efe01b8a81d5e77757fb27d789c2c02400382fe8f7de4b5786 ;; \
       *) echo "no ipso release for ${TARGETARCH}" >&2; exit 1 ;; \
     esac; \
     archive="ipso_${version}_linux_${TARGETARCH}.tar.gz"; \
