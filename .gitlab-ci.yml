@@ -1,0 +1,15 @@
+# The plan at gitlab/plans/public.json breaks a blocking decision, so ipso-check fails the job.
+# The Code Quality report is still published. This file has not been run on GitLab.
+# The catalog release is manual, so the component path below resolves only after that release.
+# Replace <group>, <project>, and <version> with the published component.
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+include:
+  - component: $CI_SERVER_FQDN/<group>/<project>/check@<version>
+    inputs:
+      command: plan
+      args: gitlab/plans/public.json
