@@ -1,0 +1,25 @@
+# The plan at azure/plans/public.json breaks a blocking decision, so IpsoCheck fails the job.
+# PublishPipelineArtifact still runs. This file has not been run on Azure DevOps.
+# The extension upload is manual, so IpsoCheck@1 resolves only after that upload.
+trigger:
+  - main
+
+pr:
+  - main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - checkout: self
+    persistCredentials: false
+  - task: IpsoCheck@1
+    name: ipso
+    inputs:
+      command: plan
+      args: azure/plans/public.json
+  - task: PublishPipelineArtifact@1
+    condition: succeededOrFailed()
+    inputs:
+      targetPath: $(ipso.evidenceDir)
+      artifact: ipso-evidence

@@ -4,7 +4,7 @@
 
 Sample repositories with ipso decisions enforced on TypeScript, JVM, Terraform and Kubernetes code.
 
-> Status: a Terraform plan check run by [`ipso-action`](https://github.com/ipsofacto-io/ipso-action), an Atlantis that refuses to apply a failing plan, Kubernetes rendering, four adapter tools, and three platform hooks. Most run real tools on every change to them, with the `ipso` v0.4.0 release. The Scalr hook has run on Scalr, and the Spacelift and env0 hooks have not run on their platforms.
+> Status: a Terraform plan check run by [`ipso-action`](https://github.com/ipsofacto-io/ipso-action), an Atlantis that refuses to apply a failing plan, Kubernetes rendering, four adapter tools, and three platform hooks. Most run real tools on every change to them, with the `ipso` v0.4.0 release. The Scalr hook has run on Scalr, and the Spacelift and env0 hooks have not run on their platforms. The Azure Pipelines example fails on a public bucket ACL, and it has not been run on Azure DevOps.
 
 Each sample is a small project that shows one canonical decision, such as private object storage, a ban on importing another service's internal package, an allow-list of Terraform modules, or Postgres as the only database.
 
@@ -30,6 +30,10 @@ Each sample is a small project that shows one canonical decision, such as privat
 ## Spacelift, env0, and Scalr
 
 [`platforms/`](platforms/) holds a hook for each platform. The `platforms / hooks` job runs the exact commands on real Terraform plans and checks their exit codes. It runs no vendor code, so it says nothing about what a platform does with an exit code.
+
+## Azure Pipelines
+
+[`azure/azure-pipelines.yml`](azure/azure-pipelines.yml) is a pipeline a customer copies after the ipso extension is installed. `IpsoCheck@1` checks [`azure/plans/public.json`](azure/plans/public.json), which breaks [`docs/decisions/0001-no-public-bucket-acl.md`](docs/decisions/0001-no-public-bucket-acl.md), so the job fails. `PublishPipelineArtifact@1` still publishes the SARIF file and the verdict report. The extension upload is manual, and this pipeline has not been run on Azure DevOps. The exit code and the files are proved by `ci / azure-pipelines` in [`ipsofacto-io/ipso`](https://github.com/ipsofacto-io/ipso).
 
 ## License
 
