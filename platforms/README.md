@@ -1,12 +1,20 @@
 # Spacelift, env0, and Scalr hooks
 
-The hook for each platform, as [`ipso/docs/platforms.md`](https://github.com/ipsofacto-io/ipso/blob/main/docs/platforms.md) describes it.
+Pre-apply hooks that run `ipso check plan` on Terraform management platforms, matching [`ipso/docs/platforms.md`](https://github.com/ipsofacto-io/ipso/blob/main/docs/platforms.md).
 
-- [`spacelift/.spacelift/config.yml`](spacelift/.spacelift/config.yml) sets a `before_apply` hook.
-- [`env0/env0.yml`](env0/env0.yml) sets a custom flow after the plan.
-- [`scalr/ipso-pre-apply.sh`](scalr/ipso-pre-apply.sh) is a script to attach at pre-apply.
+## Files
 
-> The Scalr script ran on Scalr on 2026-11-02, and a blocking violation stopped the apply, as [Validation on Scalr](https://github.com/ipsofacto-io/ipso/blob/main/docs/platforms.md#validation-on-scalr) records. That workspace was CLI-driven and not a git checkout, so its hook used `cd /opt/workdir` in place of the `git rev-parse` line. The Spacelift and env0 hooks have not run on their platforms. [`test-hooks.sh`](test-hooks.sh) reads each hook from its file and runs it on real Terraform plans of the [Atlantis sample](../atlantis/sample), so it proves the commands and their exit codes. It runs no vendor code, so it says nothing about what a platform does with that exit code. The `platforms / hooks` job runs the script whenever this directory changes.
+| Platform | Hook file | Hook stage | Live platform validation |
+| --- | --- | --- | --- |
+| Spacelift | [`spacelift/.spacelift/config.yml`](spacelift/.spacelift/config.yml) | `before_apply` | Not yet run on Spacelift |
+| env0 | [`env0/env0.yml`](env0/env0.yml) | Custom post-plan flow | Not yet run on env0 |
+| Scalr | [`scalr/ipso-pre-apply.sh`](scalr/ipso-pre-apply.sh) | Pre-apply script | Verified on Scalr (2026-11-02); blocking violation stopped apply ([notes](https://github.com/ipsofacto-io/ipso/blob/main/docs/platforms.md#validation-on-scalr)) |
+
+Note on Scalr CLI-driven workspaces: because a CLI-driven workspace is not a git checkout, replace the `git rev-parse` line in the hook with `cd /opt/workdir`.
+
+## Test locally
+
+[`test-hooks.sh`](test-hooks.sh) extracts each hook command and runs it against real Terraform plans from the [Atlantis sample](../atlantis/sample) to verify command syntax and exit codes. Because it does not invoke vendor platform code, it does not test how each platform reacts to a non-zero exit. The `platforms / hooks` CI job runs this script whenever `platforms/` changes.
 
 ```bash
 bash platforms/test-hooks.sh
